@@ -1,6 +1,6 @@
 <?php 
 namespace VladDnepr\SimpleMMO\Request;
  
-class Login {
- 
+class Login extends AbstractRequest {
+    protected $methods_available = array('POST');
 }

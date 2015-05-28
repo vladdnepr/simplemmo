@@ -1,6 +1,6 @@
 <?php 
 namespace VladDnepr\SimpleMMO\Request;
  
-class StartCombat {
- 
+class StartCombat extends AbstractRequest {
+    protected $methods_available = array('POST');
 }
