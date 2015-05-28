@@ -1,0 +1,22 @@
+{
+    "name": "vladdnepr/simplemmo",
+    "description": "Test simple MMO",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Vladislav Lyshenko",
+            "email": "vladdnepr1989@gmail.com"
+        }
+    ],
+    "require": {
+        "twig/twig": "1.*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "4.0.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "VladDnepr\\SimpleMMO\\": "src"
+        }
+    }
+}
