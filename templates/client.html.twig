@@ -117,13 +117,19 @@
 
             var showOpponents = function(){
                 $.getMMOAjax('choose', {}, function(response){
-                    var select = $("#choose select");
-                    select.empty();
-                    jQuery.each(response, function(i, el){
-                        select.append(
-                            $('<option></option>').val(el.id).html(el.name)
-                        );
-                    });
+
+                    if (response.length) {
+                        var select = $("#choose select");
+                        select.empty();
+                        jQuery.each(response, function(i, el){
+                            select.append(
+                                $('<option></option>').val(el.id).html(el.name)
+                            );
+                        });
+                    } else {
+                        $("#choose").html('Нет подходящих противников, запустите генерацию ботов');
+                    }
+
                     $("#choose").show();
                 });
             };

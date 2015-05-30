@@ -30,10 +30,13 @@ class Character {
         $stmt = $this -> container['db'] -> prepare('SELECT id FROM characters where level = :level AND login LIKE "bot_%" LIMIT 1000');
         $stmt -> execute(array('level' => $char -> getLevel()));
         $opponents_ids = $stmt -> fetchAll(\PDO::FETCH_COLUMN);
-        $opponents_ids_keys = array_rand($opponents_ids, $limit);
 
-        foreach($opponents_ids_keys as $opponent_id_key) {
-            $result[] = $this -> getByID($opponents_ids[$opponent_id_key]);
+        if (!empty($opponents_ids)) {
+            $opponents_ids_keys = array_rand($opponents_ids, $limit);
+
+            foreach($opponents_ids_keys as $opponent_id_key) {
+                $result[] = $this -> getByID($opponents_ids[$opponent_id_key]);
+            }
         }
 
         return $result;
