@@ -437,7 +437,7 @@ class Combat extends AbstractModel {
      * @param $skill2
      * @return mixed
      */
-    protected function getScoreAfterAttack($skill1, $skill2)
+    public function getScoreAfterAttack($skill1, $skill2)
     {
         return max($skill1['value'] - $skill2['value'], 0);
     }

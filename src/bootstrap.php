@@ -46,7 +46,7 @@ $container['template'] = function ($c) {
 
     $loader = new Twig_Loader_Filesystem(__DIR__ . '/../templates');
     return new Twig_Environment($loader, array(
-//        'cache' => __DIR__ . '/../cache/twig',
+        'cache' => __DIR__ . '/../cache/twig',
     ));
 };
 
