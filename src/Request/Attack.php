@@ -1,7 +1,7 @@
 <?php 
 namespace VladDnepr\SimpleMMO\Request;
  
-class Attack extends AbstractRequest {
+class Attack extends API {
     protected $methods_available = array('POST');
     protected $data_required = array('skill_id');
 

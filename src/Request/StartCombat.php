@@ -1,9 +1,9 @@
 <?php 
 namespace VladDnepr\SimpleMMO\Request;
  
-class StartCombat extends AbstractRequest {
+class StartCombat extends API {
     protected $methods_available = array('POST');
-    protected $data_required = array('opponent');
+    protected $data_required = array('opponent_id');
 
     function handleData($data)
     {
@@ -17,7 +17,7 @@ class StartCombat extends AbstractRequest {
         $combat_repository = $this -> container['combat_repository'];
 
         $combat = $combat_repository -> getPlayerCombat($this -> character);
-        $opponent = $char_repository -> getByID($data['opponent']);
+        $opponent = $char_repository -> getByID($data['opponent_id']);
 
         if (!$combat) {
             if ($opponent) {

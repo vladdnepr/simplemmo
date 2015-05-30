@@ -20,7 +20,7 @@ class Character {
      * Get randomly opponents with same level
      * @param Model $char
      * @param int $limit
-     * @return array
+     * @return \VladDnepr\SimpleMMO\Model\Character[]
      */
     public function getOpponents(Model $char, $limit = 2)
     {

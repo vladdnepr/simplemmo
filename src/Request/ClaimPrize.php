@@ -1,7 +1,7 @@
 <?php 
 namespace VladDnepr\SimpleMMO\Request;
  
-class ClaimPrize extends AbstractRequest {
+class ClaimPrize extends API {
     protected $methods_available = array('POST');
 
     function handleData($data)
@@ -19,18 +19,16 @@ class ClaimPrize extends AbstractRequest {
             if ($combat -> isEnded()) {
 
                 $winner = $combat -> getWinner();
+                $winner -> addCoins($combat -> getWinCoins());
+                $winner -> incrementWins();
 
-                if ($winner == $this -> character) {
-                    $coins = $winner -> getCoins();
-                    $coins += $combat -> getWinCoins();
-                    $winner -> setCoins($coins);
-                    $char_repository -> persist($winner);
-                }
+                $char_repository -> persist($winner);
 
                 $combat_repository -> clear($combat);
 
-                $result[0] = $winner -> dump();
-                $result[1] = $this -> character -> dump();
+                $result = array(
+                    'char' => $this -> character -> dump()
+                );
 
             } else {
                 $result = array('error' => "Combat is not over");

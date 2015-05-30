@@ -10,7 +10,7 @@ class Server {
 
     function __construct(\Pimple\Container $container)
     {
-        $this -> contaner = $container;
+        $this -> container = $container;
     }
 
 
@@ -18,23 +18,19 @@ class Server {
     {
         try {
             try {
-                $request = $this -> contaner[self::REQUEST_NAME_PREFIX . $this -> getRequestNameFromURI($uri)];
+                $request = $this -> container[self::REQUEST_NAME_PREFIX . $this -> getRequestNameFromURI($uri)];
             } catch (\InvalidArgumentException $e) {
                 throw new BadRequestException("Request not found");
             }
 
-            $response_data = $request -> handle();
-
-            $serializer = $this -> contaner['serializer'];
-            header("Content-Type: " . $serializer -> getContentType());
-            echo $serializer -> encode($response_data);
+            echo $request -> handle();
         } catch(BadRequestException $e) {
             header('HTTP/1.1 400 Bad Request');
             echo $e -> getMessage();
-        }/* catch (\Exception $e) {
+        } catch (\Exception $e) {
             header('HTTP/1.1 500 Server Error');
             echo $e -> getMessage();
-        }*/
+        }
     }
 
     public function getRawPOST()

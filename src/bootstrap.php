@@ -2,8 +2,6 @@
 
 require __DIR__ . '/../vendor/autoload.php';
 
-Twig_Autoloader::register();
-
 $container = new Pimple\Container();
 $container['db_config'] = function ($c) {
     return require __DIR__ . '/../config/db.php';
@@ -42,6 +40,16 @@ $container['cache'] = function ($c) {
 
     return $cache;
 };
+
+$container['template'] = function ($c) {
+    Twig_Autoloader::register();
+
+    $loader = new Twig_Loader_Filesystem(__DIR__ . '/../templates');
+    return new Twig_Environment($loader, array(
+//        'cache' => __DIR__ . '/../cache/twig',
+    ));
+};
+
 $container['server'] = function ($c) {
     return new \VladDnepr\SimpleMMO\Server($c);
 };

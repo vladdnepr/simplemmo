@@ -3,6 +3,8 @@ namespace VladDnepr\SimpleMMO\Model;
  
 class Character extends AbstractModel {
 
+    const LEVELUP_WINS_DIFF = 10;
+
     protected $id;
     protected $login;
     protected $name;
@@ -52,6 +54,11 @@ class Character extends AbstractModel {
     public function getCoins()
     {
         return $this->coins;
+    }
+
+    public function addCoins($coins)
+    {
+        $this -> coins += $coins;
     }
 
     /**
@@ -139,6 +146,17 @@ class Character extends AbstractModel {
      */
     public function getWins()
     {
+        return $this->wins;
+    }
+
+    public function incrementWins()
+    {
+        $this->wins++;
+
+        if ($this -> wins % self::LEVELUP_WINS_DIFF == 0) {
+            $this->level++;
+        }
+
         return $this->wins;
     }
 

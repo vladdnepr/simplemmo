@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Simple MMO Game</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+
+        form {
+            margin: 10px;
+        }
+
+        form label {
+            display: block;
+        }
+
+        .error {
+            font-size: 150%;
+            color: red;
+        }
+
+        .combat span {
+            display: block;
+            background-color: #eee;
+        }
+
+        .char span {
+            display: block;
+            background-color: #eee;
+        }
+    </style>
+  </head>
+  <body>
+    <h1>Самая лучшая игра Simple MMO</h1>
+    <span id="error" class="error"></span>
+    <span id="char" class="char"></span>
+    <form id="login">
+        <label>Вход</label>
+        <label><input type="text" name="login"/> Логин</label>
+        <input type="submit" value="Войти">
+    </form>
+    <form id="register">
+        <label>Регистрация</label>
+        <label><input type="text" name="login"/> Логин</label>
+        <label><input type="text" name="name"/> Имя</label>
+        <input type="submit" value="Зарегистрироваться">
+    </form>
+    <form id="choose" style="display: none">
+        <label>Выбор противника</label>
+        <select>
+
+        </select>
+        <input type="submit" value="Выбрать">
+    </form>
+    <form id="combat" style="display: none">
+        <label>Бой</label>
+        <span id="combat_scores" class="combat"></span>
+        <span id="combat_history" class="combat"></span>
+        <span id="combat_attack">
+            <select></select>
+            <input type="submit" value="Атаковать">
+        </span>
+    </form>
+    <form id="claimprize" style="display: none">
+        <label>Получение приза</label>
+        <input type="submit" value="Получить">
+    </form>
+    <form id="lost" style="display: none">
+        <label>Вы проиграли</label>
+        <input type="submit" value="Попробовать еще">
+    </form>
+    <script src="http://code.jquery.com/jquery.js"></script>
+    <script>
+
+        var char;
+        var token;
+
+        var plural_str = function(i, str1, str2, str3){
+          function plural (a){
+            if ( a % 10 == 1 && a % 100 != 11 ) return 0;
+            else if ( a % 10 >= 2 && a % 10 <= 4 && ( a % 100 < 10 || a % 100 >= 20)) return 1;
+            else return 2;
+          }
+          switch (plural(i)) {
+            case 0: return str1;
+            case 1: return str2;
+            default: return str3;
+          }
+        };
+
+        // wait for the DOM to be loaded
+        $(document).ready(function() {
+
+            $.getMMOAjax = function(action, data, callback) {
+                $('#error').html('');
+
+                if (token) {
+                    data['token'] = token;
+                }
+
+                return $.ajax({
+                    url: "/" + action + "/",
+                    context: document.body,
+                    method: "POST",
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(data)
+                }).done(function(response) {
+                    if (!response.error) {
+                        if (callback) {
+                            callback(response);
+                        }
+                    } else {
+                        $('#error').html(response.error);
+                    }
+                });
+            };
+
+            var showOpponents = function(){
+                $.getMMOAjax('choose', {}, function(response){
+                    var select = $("#choose select");
+                    select.empty();
+                    jQuery.each(response, function(i, el){
+                        select.append(
+                            $('<option></option>').val(el.id).html(el.name)
+                        );
+                    });
+                    $("#choose").show();
+                });
+            };
+
+            var authorize = function(char_token, char_info){
+                char = char_token;
+                token = char_info;
+                $("#login").hide();
+                $("#register").hide();
+                showOpponents();
+                updateCharInfo();
+            };
+
+            var updateCharInfo = function(){
+                var char_info = $("#char");
+                char_info.empty();
+                jQuery.each(char, function(key, el){
+
+                    var string = key + ': ';
+
+                    if (typeof el === 'object') {
+                        string += $.map(el, function(value, key){return value}).reduce(function(result, current){
+                            return result += current.name + ': ' + current.value + ' ';
+                        }, '');
+                    } else {
+                        string += el;
+                    }
+                    char_info.append(
+                        $('<span></span>').html(string)
+                    );
+                });
+            };
+
+            var updateCombat = function(data) {
+
+                var attack_skill = $("#combat select");
+                var combat_scores = $("#combat_scores");
+                var combat_history = $("#combat_history");
+
+                attack_skill.empty();
+                jQuery.each(data.available_skills, function(i, el){
+                    attack_skill.append(
+                        $('<option></option>').val(el).html(data.your_skills[el].name)
+                    );
+                });
+
+                combat_scores.empty();
+                combat_scores.append(
+                    $('<span></span>').html("Ваши очки:" + data.your_score)
+                );
+                combat_scores.append(
+                    $('<span></span>').html("Очки противника:" + data.opponent_score)
+                );
+
+
+                combat_history.empty();
+                jQuery.each(data.history, function(i, el){
+
+                    var message = '';
+
+                    if (el.id == char.id) {
+                        message += 'Вы использовали "' + data.your_skills[el.skill_id].name + '" и получили ';
+
+                    } else {
+                        message += 'Противник использовал "' + data.opponent_skills[el.skill_id].name + '" и получил ';
+                    }
+
+                    message += el.score + ' ' + plural_str(el.score, 'очко', 'очка', 'очков');
+
+                    combat_history.append(
+                        $('<span></span>').html(message)
+                    );
+                });
+
+                if (data.ended) {
+                    $('#combat_attack').hide();
+                    if (data.winner_id == char.id) {
+                        $('#claimprize').show();
+                    } else {
+                        $('#lost').show();
+                    }
+                }
+            };
+
+            $('#login input[type=submit]').click(function(e){
+                e.stopPropagation();
+                e.preventDefault();
+
+                $.getMMOAjax('login', {"login": $('#login input[name=login]')[0].value}, function(response){
+                    authorize(response.char, response.token);
+                });
+            });
+
+            $('#register input[type=submit]').click(function(e){
+                e.stopPropagation();
+                e.preventDefault();
+
+                $.getMMOAjax('register', {"login": $('#register input[name=login]')[0].value, "name": $('#register input[name=name]')[0].value}, function(response){
+                    authorize(response.char, response.token);
+                });
+            });
+
+            $('#choose input[type=submit]').click(function(e){
+                e.stopPropagation();
+                e.preventDefault();
+
+                $("#choose").hide();
+
+                $.getMMOAjax('combat', {"opponent_id": $('#choose select').val()}, function(response){
+                    $('#combat').show();
+                    $('#combat_attack').show();
+                    updateCombat(response);
+                });
+            });
+
+            $('#combat input[type=submit]').click(function(e){
+                e.stopPropagation();
+                e.preventDefault();
+
+                $.getMMOAjax('attack', {"skill_id": $('#combat select').val()}, function(response){
+                    updateCombat(response);
+                });
+            });
+
+            $('#claimprize input[type=submit]').click(function(e){
+                e.stopPropagation();
+                e.preventDefault();
+
+                $.getMMOAjax('claimprize', {}, function(response){
+                    $('#combat').hide();
+                    $('#claimprize').hide();
+                    $('#choose').show();
+                    char = response.char;
+                    updateCharInfo();
+                });
+            });
+
+            $('#lost input[type=submit]').click(function(e){
+                e.stopPropagation();
+                e.preventDefault();
+
+                $.getMMOAjax('claimprize', {}, function(response){
+                    $('#combat').hide();
+                    $('#lost').hide();
+                    $('#choose').show();
+                    char = response.char;
+                    updateCharInfo();
+                });
+            });
+        });
+    </script>
+  </body>
+</html>

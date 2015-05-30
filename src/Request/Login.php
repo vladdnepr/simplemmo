@@ -1,7 +1,9 @@
 <?php 
 namespace VladDnepr\SimpleMMO\Request;
  
-class Login extends AbstractRequest {
+use VladDnepr\SimpleMMO\Model\Character;
+
+class Login extends API {
     protected $methods_available = array('POST');
     protected $need_character = false;
     protected $data_required = array('login');
@@ -14,7 +16,10 @@ class Login extends AbstractRequest {
         $char = $repository -> getByLogin($data['login']);
 
         if ($char) {
-            $result = array('token' => $repository -> getCharacterToken($char));
+            $result = array(
+                'char' => $char -> dump(),
+                'token' => $repository -> getCharacterToken($char)
+            );
         } else {
             $result = array('error' => "User with login " . $data['login'] . " not found");
         }
