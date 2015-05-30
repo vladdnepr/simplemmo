@@ -9,6 +9,9 @@
         }
     ],
     "require": {
+        "ext-pdo": "*",
+        "ext-pdo_mysql": "*",
+        "ext-memcached": "*",
         "twig/twig": "1.*",
         "pimple/pimple": "~3.0",
         "fkooman/json": "0.6.*"

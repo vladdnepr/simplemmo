@@ -25,14 +25,16 @@ class Server {
 
             $response_data = $request -> handle();
 
-            echo $this -> contaner['serializer'] -> encode($response_data);
+            $serializer = $this -> contaner['serializer'];
+            header("Content-Type: " . $serializer -> getContentType());
+            echo $serializer -> encode($response_data);
         } catch(BadRequestException $e) {
             header('HTTP/1.1 400 Bad Request');
             echo $e -> getMessage();
-        } catch (\Exception $e) {
+        }/* catch (\Exception $e) {
             header('HTTP/1.1 500 Server Error');
             echo $e -> getMessage();
-        }
+        }*/
     }
 
     public function getRawPOST()

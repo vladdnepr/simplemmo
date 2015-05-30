@@ -14,4 +14,9 @@ class JSON {
     {
         return Parser::encode($data);
     }
+
+    public function getContentType()
+    {
+        return 'application/json';
+    }
 }
