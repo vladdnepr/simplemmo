@@ -22,4 +22,8 @@
 
 ## Testing
 
+## Test docs
+
+[Link](docs/index.html)
+
 Run `./vendor/bin/phpunit`
